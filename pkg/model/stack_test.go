@@ -221,9 +221,11 @@ func TestStack_validate(t *testing.T) {
 			name: "endpoint-of-undefined-service",
 			stack: &Stack{
 				Name: "name",
-				Endpoints: map[string][]Endpoint{
+				Endpoints: map[string]Endpoint{
 					"endpoint1": {
-						{Service: "app"},
+						Rules: []EndpointRule{
+							{Service: "app"},
+						},
 					},
 				},
 				Services: map[string]Service{
@@ -235,10 +237,12 @@ func TestStack_validate(t *testing.T) {
 			name: "endpoint-of-unexported-port",
 			stack: &Stack{
 				Name: "name",
-				Endpoints: map[string][]Endpoint{
+				Endpoints: map[string]Endpoint{
 					"endpoint1": {
-						{Service: "name",
-							Port: 80},
+						Rules: []EndpointRule{
+							{Service: "app",
+								Port: 80},
+						},
 					},
 				},
 				Services: map[string]Service{

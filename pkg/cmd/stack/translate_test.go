@@ -485,9 +485,13 @@ func Test_translateService(t *testing.T) {
 func Test_translateEndpoints(t *testing.T) {
 	s := &model.Stack{
 		Name: "stackName",
-		Endpoints: map[string][]model.Endpoint{
-			"svcName": {
-				{Path: "/", Port: 80, Service: "svcName"},
+		Endpoints: map[string]model.Endpoint{
+			"endpoint1": {
+				Rules: []model.EndpointRule{
+					{Path: "/",
+						Service: "svcName",
+						Port:    80},
+				},
 			},
 		},
 		Services: map[string]model.Service{
@@ -496,8 +500,8 @@ func Test_translateEndpoints(t *testing.T) {
 			},
 		},
 	}
-	result := translateIngress("svcName", s)
-	if result.Name != "svcName" {
+	result := translateIngress("endpoint1", s)
+	if result.Name != "endpoint1" {
 		t.Errorf("Wrong service name: '%s'", result.Name)
 	}
 
@@ -519,12 +523,12 @@ func Test_translateEndpoints(t *testing.T) {
 	}
 
 	if !reflect.DeepEqual(result.Spec.Rules[0].HTTP.Paths, paths) {
-		t.Errorf("Wrong service ports: '%v'", result.Spec.Rules[0].HTTP.Paths)
+		t.Errorf("Wrong ingress: '%v'", result.Spec.Rules[0].HTTP.Paths)
 	}
 
 	labels := map[string]string{
 		okLabels.StackNameLabel:         "stackName",
-		okLabels.StackEndpointNameLabel: "svcName",
+		okLabels.StackEndpointNameLabel: "endpoint1",
 	}
 	if !reflect.DeepEqual(result.Labels, labels) {
 		t.Errorf("Wrong labels: '%s'", result.Labels)
